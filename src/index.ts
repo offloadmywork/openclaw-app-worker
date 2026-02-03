@@ -1,6 +1,7 @@
 import { Env } from './types';
 import { handleWebhook } from './webhook';
 import { handleOAuthCallback } from './oauth';
+import { handleSetup, handleSetupCallback } from './setup';
 
 /**
  * Main Cloudflare Worker entry point
@@ -27,6 +28,10 @@ export default {
         return await handleWebhook(request, env);
       } else if (path === '/auth/callback' && request.method === 'GET') {
         return await handleOAuthCallback(request, env);
+      } else if (path === '/setup' && request.method === 'GET') {
+        return handleSetup();
+      } else if (path === '/setup/callback' && request.method === 'GET') {
+        return await handleSetupCallback(request);
       } else if (path === '/health' && request.method === 'GET') {
         return new Response(JSON.stringify({ status: 'ok', timestamp: Date.now() }), {
           status: 200,
@@ -65,9 +70,10 @@ function createHomePage(): string {
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
       margin: 0;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 2rem;
     }
     .container {
       background: white;
@@ -76,6 +82,7 @@ function createHomePage(): string {
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       text-align: center;
       max-width: 600px;
+      width: 100%;
     }
     h1 {
       color: #333;
@@ -89,6 +96,20 @@ function createHomePage(): string {
       color: #666;
       line-height: 1.6;
       margin-bottom: 2rem;
+    }
+    .cta {
+      background: #667eea;
+      color: white;
+      text-decoration: none;
+      padding: 1rem 2rem;
+      border-radius: 0.5rem;
+      display: inline-block;
+      font-weight: 600;
+      margin-bottom: 2rem;
+      transition: background 0.2s;
+    }
+    .cta:hover {
+      background: #5568d3;
     }
     .endpoints {
       background: #f5f5f5;
@@ -122,8 +143,16 @@ function createHomePage(): string {
       It automatically sets up repositories with workflows and secrets when installed.
     </p>
     
+    <a href="/setup" class="cta">🚀 Register GitHub App</a>
+    
     <div class="endpoints">
       <h3>Available Endpoints:</h3>
+      <div class="endpoint">
+        <span class="method">GET</span> /setup - App registration wizard
+      </div>
+      <div class="endpoint">
+        <span class="method">GET</span> /setup/callback - Registration callback
+      </div>
       <div class="endpoint">
         <span class="method">POST</span> /webhook - GitHub webhook receiver
       </div>

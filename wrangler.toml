@@ -1,6 +1,12 @@
 name = "openclaw-app-worker"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
+account_id = "9f115f48742baa27266fe2138fd16ba3"
+
+# Routes
+routes = [
+  { pattern = "openclaw-app.offloadmy.work/*", zone_name = "offloadmy.work" }
+]
 
 # Environment variables (set via wrangler secret put)
 # GITHUB_APP_ID
